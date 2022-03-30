@@ -1,0 +1,77 @@
+---
+title: "The Ames Housing Data"
+output: html_notebook
+---
+
+```{r setup, include=FALSE, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(tidymodels)
+```
+
+# Goal
+**Predict** the **sale price** of a house based on:  
+- house characteristics  
+- location  
+- lot information  
+- rating of condition and quality  
+
+# Load the data
+```{r}
+data(ames)
+
+tibble(ames)
+```
+
+# Exploring important features
+## Sale_Price (USD)
+```{r price}
+ames %>% ggplot(aes(x = Sale_Price)) +
+	geom_histogram(bins = 50,
+		     color = "white",
+		     fill = "gray47") +
+	geom_vline(xintercept = median(ames$Sale_Price),
+		 color = "red",
+		 size = 1,
+		 linetype = "dashed")
+
+summary(ames$Sale_Price)
+```
+
+Leff-skewed distribution: more inexpensive houses than expensive houses  
+=> log-transform to get normal distribution  
+
+```{r pricelog10}
+ames %>% ggplot(aes(x = Sale_Price)) +
+	geom_histogram(bins = 50,
+		     color = "white",
+		     fill = "gray47") +
+	scale_x_log10()
+```
+
+# Geographic locations
+##  Neighborhoods in Ames, IA
+```{r location, warning=FALSE, message=FALSE}
+library(ggmap)
+library(rgdal)
+
+map_bb <- c(left = min(ames$Longitude) - 0.005,
+	  bottom = min(ames$Latitude) - 0.005,
+	  right = max(ames$Longitude) + 0.005,
+	  top = max(ames$Latitude) + 0.005)
+
+# get stamen map
+site_stamen <- ggmap::get_stamenmap(bbox = map_bb,
+			      maptype = "watercolor",
+			      zoom = 13)
+
+fig = ggmap(site_stamen) +
+	# Add the sample sites to the main plot as points.
+	geom_point(data = ames,
+		mapping = aes(x = Longitude,
+			    y = Latitude,
+			    color = Neighborhood)) +
+	labs(x = "Longitude", y = "Latitude")
+```
+
