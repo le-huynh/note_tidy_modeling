@@ -11,6 +11,6 @@
 # 
 ################################################################################
 
-figures/chap01_map.png:\
-code/chap01_plot_map.R
-	Rscript code/chap01_plot_map.R
+figures/chap04_map.png:\
+code/chap04_plot_map.R
+	Rscript code/chap04_plot_map.R
